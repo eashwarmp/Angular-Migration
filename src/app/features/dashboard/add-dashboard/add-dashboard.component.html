@@ -1,21 +1,33 @@
-<h2>Add users</h2>
-<form class="mb-10" (ngSubmit)="onSubmit()">
+<form class="mb-10" [formGroup]="userForm" (ngSubmit)="onSubmit()">
   <div class="mb-3">
     <label for="email">Email : </label>
-    <input id="email" name="email" [(ngModel)]="user.email" />
+    <input id="email" formControlName="email" />
+    <div *ngIf="email.errors?.['required'] && email.touched">
+      Email is required
+    </div>
+    <div *ngIf="email.errors?.['email'] && email.touched">
+      Invalid email format
+    </div>
   </div>
+
   <div class="mb-3">
     <label for="phone">Phone : </label>
-    <input id="phone" name="phone" [(ngModel)]="user.phone" />
+    <input id="phone" formControlName="phone" />
+    <div *ngIf="phone.errors?.['required'] && phone.touched">
+      Phone is required
+    </div>
+    <div *ngIf="phone.errors?.['pattern'] && phone.touched">
+      Must be a 10-digit number
+    </div>
   </div>
+
   <div class="mb-3">
     <label for="cname">Company : </label>
-    <input id="cname" name="cname" [(ngModel)]="user.cname" />
+    <input id="cname" formControlName="cname" />
+    <div *ngIf="cname.errors?.['required'] && cname.touched">
+      Company name is required
+    </div>
   </div>
 
-  <div class="submit" class="mb-10 mt-20">
-    <button class="btn btn-primary">Submit</button>
-  </div>
+  <button class="btn btn-primary" [disabled]="userForm.invalid">Submit</button>
 </form>
-
-<div class="mt-20">Preview : {{ user | json }}</div>

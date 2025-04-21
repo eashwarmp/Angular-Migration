@@ -1,55 +1,52 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { signal, effect, computed } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddDashboardComponent } from './add-dashboard/add-dashboard.component';
 import { UserService } from '../../core/user.service';
 import { User } from '../../interfaces/user';
 import { UiService } from '../../core/ui.service';
 import { Subscription, Subject, takeUntil } from 'rxjs';
 
+interface addUserProps {
+  email: string;
+  phone: string;
+  cname: string;
+}
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, FormsModule, AddDashboardComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    AddDashboardComponent,
+    ReactiveFormsModule,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   standalone: true,
 })
-export class DashboardComponent implements OnInit {
-  users: User[] = [];
-  showAddTask: boolean = false;
-  subscription!: Subscription;
-  private destroy$ = new Subject<void>();
+export class DashboardComponent {
+  users = signal<User[]>([]);
+  showAddTask!: typeof this.uiService.toggleAdd;
 
   user!: User;
 
-  constructor(private userService: UserService, private uiService: UiService) {}
-
-  ngOnInit(): void {
-    this.userService
-      .getUsers()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((user) => (this.users = user));
-    this.uiService.toggleAdd$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((val) => (this.showAddTask = val));
+  constructor(private userService: UserService, private uiService: UiService) {
+    this.userService.getUsers().subscribe((val) => this.users.set(val));
+    this.showAddTask = this.uiService.toggleAdd;
   }
 
-  onToggle() {
-    this.uiService.toggleAdd();
+  toggleAdd() {
+    this.uiService.toToggle();
   }
 
-  addUser({ email, phone, cname }: any) {
-    const newUser: User = {
-      id: this.users.length + 1,
+  addUser({ email, phone, cname }: addUserProps) {
+    let newVal: User = {
+      id: this.users().length + 1,
       email,
       phone,
       company: { name: cname },
     };
-    this.users = [...this.users, newUser];
-  }
-
-  ngOnDestroy() {
-    this.destroy$.next(); // Emits a value to complete all subscriptions
-    this.destroy$.complete(); // Clean up the subject
+    this.users.update((prevVals) => [...prevVals, newVal]);
   }
 }

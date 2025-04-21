@@ -1,19 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UiService {
-  private toggleAddSubject = new Subject<boolean>();
-  toggleAdd$ = this.toggleAddSubject.asObservable();
+  _toggleAdd = signal<boolean>(false);
 
-  toggleAddBtn: boolean = false;
+  toggleAdd = this._toggleAdd.asReadonly();
 
-  constructor() {}
-
-  toggleAdd() {
-    this.toggleAddBtn = !this.toggleAddBtn;
-    this.toggleAddSubject.next(this.toggleAddBtn);
+  toToggle() {
+    console.log('Coming in toToggle');
+    this._toggleAdd.set(!this._toggleAdd());
   }
 }

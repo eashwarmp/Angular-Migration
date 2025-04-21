@@ -1,6 +1,6 @@
 <div class="user-header mt-20">
   <h1>User Dashboard</h1>
-  <button (click)="onToggle()" class="btn btn-secondary add-btn">
+  <button (click)="toggleAdd()" class="btn btn-secondary add-btn">
     Add Users
   </button>
 </div>
@@ -13,19 +13,26 @@
       <th>Phone:</th>
       <th>Company name:</th>
     </thead>
-    <tbody *ngFor="let user of users">
+
+    <tbody>
+      {{
+        user | json
+      }}
+      @for (user of users(); track user.id) {
       <tr>
         <td>{{ user.id }}</td>
         <td>{{ user.email }}</td>
         <td>{{ user.phone }}</td>
         <td>{{ user.company.name }}</td>
       </tr>
+      }
     </tbody>
   </table>
 </div>
 
-@if(showAddTask) {
+@if (showAddTask()) {
 <div class="container add mt-5">
   <app-add-dashboard (submitEvent)="addUser($event)"></app-add-dashboard>
 </div>
+
 }
