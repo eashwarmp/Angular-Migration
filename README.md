@@ -1,59 +1,34 @@
-# AngularV19MigrationLab
+# Angular-Migration
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.3.
+A small Angular 19 app for working through the move from module-based Angular to the modern APIs: standalone
+components, signals, built-in control flow and functional providers. The app is a user dashboard: it loads users
+from an API, lists them in a table, and adds new ones through a validated form.
 
-## Development server
+## What it covers
 
-To start a local development server, run:
+| Older pattern | What this project uses instead |
+| --- | --- |
+| `NgModule` + `AppModule` bootstrap | Standalone components, `bootstrapApplication` with `app.config.ts` |
+| `*ngFor` / `*ngIf` | Built-in `@for (…; track …)` and `@if` blocks |
+| `BehaviorSubject` for local UI state | `signal()`, `.update()` and read-only signals (`asReadonly()`) |
+| `StoreModule.forRoot` / `HttpClientModule` | `provideStore`, `provideEffects`, `provideStoreDevtools`, `provideHttpClient` |
+| Template-driven forms | Reactive forms with `FormBuilder` and validators (email, 10-digit phone, required) |
 
-```bash
-ng serve
+- **`DashboardComponent`** holds the user list in a signal and appends new users with `users.update(...)`.
+- **`UiService`** keeps the "add user" panel's open state in a private writable signal and exposes only a
+  read-only one.
+- **`state/users/`** sets up NgRx 19 with `createAction`, `createReducer` and a `createEffect` that loads users
+  through `UserService`.
+
+## Stack
+
+Angular 19.2, NgRx 19 (store, effects, devtools), RxJS 7.8, TypeScript, SCSS. User data comes from
+[JSONPlaceholder](https://jsonplaceholder.typicode.com/users).
+
+## Run locally
+
+```sh
+npm install
+npx ng serve    # http://localhost:4200
+npx ng test
 ```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
